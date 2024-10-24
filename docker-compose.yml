@@ -21,8 +21,8 @@ services:
         max-size: "100k"
     cap_add:
       - SYS_PTRACE
-    # volumes:
-    # - .:/src/aioshadowsocks
+    volumes:
+      - .:/src/aioshadowsocks
     working_dir: /src/aioshadowsocks
     command: ["python", "-m", "shadowsocks", "run_ss_server"]
   ehco:
