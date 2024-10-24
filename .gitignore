@@ -111,3 +111,4 @@ dev.sh
 test_client.py
 
 *.DS_Store
+.idea
