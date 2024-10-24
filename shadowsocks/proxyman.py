@@ -43,21 +43,33 @@ class ProxyMan:
             res = await client.get(url)
             User.create_or_update_by_user_data_list(res.json()["users"])
 
-    @staticmethod
-    async def flush_metrics_to_remote(url):
-        data = [
-            {
+    async def flush_metrics_to_remote(self, url):
+        data = []
+        total_upload_traffic = 0
+        total_download_traffic = 0
+
+        for user in User.get_need_sync_user_metrics():
+            total_upload_traffic += user.upload_bandwidth
+            total_download_traffic += user.download_bandwidth
+            data.append({
                 "user_id": user.user_id,
                 "ip_list": list(user.ip_list),
                 "tcp_conn_num": user.tcp_conn_num,
                 "upload_traffic": user.upload_traffic,
                 "download_traffic": user.download_traffic,
-            }
-            for user in User.get_need_sync_user_metrics()
-        ]
+            })
+
+        upload_bandwidth = int(total_upload_traffic / self.sync_time)
+        download_bandwidth = int(total_download_traffic / self.sync_time)
+
+        payload = {
+            "data": data,
+            "upload_bandwidth": upload_bandwidth,
+            "download_bandwidth": download_bandwidth
+        }
         async with httpx.AsyncClient() as client:
             try:
-                await client.post(url, json={"data": data})
+                await client.post(url, json=payload)
             except Exception as e:
                 logging.warning(f"flush_metrics_to_remote error: {e}")
             else:
