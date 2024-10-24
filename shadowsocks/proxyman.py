@@ -49,8 +49,8 @@ class ProxyMan:
         total_download_traffic = 0
 
         for user in User.get_need_sync_user_metrics():
-            total_upload_traffic += user.upload_bandwidth
-            total_download_traffic += user.download_bandwidth
+            total_upload_traffic += user.upload_traffic
+            total_download_traffic += user.download_traffic
             data.append({
                 "user_id": user.user_id,
                 "ip_list": list(user.ip_list),
